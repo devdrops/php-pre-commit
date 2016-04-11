@@ -1,4 +1,4 @@
-# path to phpcs "binary"
+# path to binaries
 PHPCS_BIN=/usr/local/bin/phpcs
 PHPCSFIXER_BIN=/Users/davimarcondes/.composer/vendor/bin/php-cs-fixer
 PHPMD_BIN=/usr/local/bin/phpmd
