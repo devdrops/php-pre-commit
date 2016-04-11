@@ -113,18 +113,18 @@ done
 
 echo ""
 echo " :: PHP CodeSniffer inspection :: "
-echo ""
-PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $SNIFFS $STAGED_FILES)
+PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
 PHPCS_RETVAL=$?
 
 if [ $PHPCS_RETVAL -ne 0 ]; then
-    echo "$PHPCS_OUTPUT" | less
+    echo "    Issues found: "
+    echo "$PHPCS_OUTPUT"
 
     rm -rf $TMP_STAGING
 
     exit $PHPCS_RETVAL
 else
-    echo " :: Inspection is OK! :: "
+    echo " -> Inspection is OK!"
 fi
 
 echo ""
@@ -134,13 +134,14 @@ PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES text cleancode,codesize,controversial,de
 PHPMD_RETVAL=$?
 
 if [ $PHPMD_RETVAL -ne 0 ]; then
-    echo "$PHPMD_OUTPUT" | less
+    echo "    Issues found: "
+    echo "$PHPMD_OUTPUT"
 
     rm -rf $TMP_STAGING
 
     exit $PHPMD_RETVAL
 else
-    echo " :: Inspection is OK! :: "
+    echo " -> Inspection is OK!"
 fi
 
 exit 0;
