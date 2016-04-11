@@ -1,5 +1,7 @@
 # path to phpcs "binary"
 PHPCS_BIN=/usr/local/bin/phpcs
+PHPCSFIXER_BIN=/Users/davimarcondes/.composer/vendor/bin/php-cs-fixer
+PHPMD_BIN=/usr/local/bin/phpmd
 
 # the coding standard, you can also specify a path to your own standard here
 # e. g. /path/to/my/standard/dir/

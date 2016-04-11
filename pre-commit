@@ -113,14 +113,44 @@ do
   STAGED_FILES="$STAGED_FILES $TMP_STAGING/$FILE"
 done
 
-OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $SNIFFS $STAGED_FILES)
-RETVAL=$?
+echo ""
+echo " :: PHP CodeSniffer inspection :: "
+echo ""
+PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $SNIFFS $STAGED_FILES)
+PHPCS_RETVAL=$?
+
+if [ $PHPCS_RETVAL -ne 0 ]; then
+    echo "$PHPCS_OUTPUT" | less
+else
+    echo " :: Inspection is OK! :: "
+fi
+
+echo ""
+echo " :: PHP CS Fixer inspection :: "
+echo ""
+PHPCSFIXER_OUTPUT=$($PHPCSFIXER_BIN fix $STAGED_FILES --level=psr2 --dry-run --diff)
+PHPCSFIXER_RETVAL=$?
+
+if [ $PHPCSFIXER_RETVAL -ne 0 ]; then
+    echo "$PHPCSFIXER_OUTPUT" | less
+else
+    echo " :: Inspection is OK! :: "
+fi
+
+echo ""
+echo " :: PHP Mess Detector inspection :: "
+echo ""
+PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES text cleancode,codesize,controversial,design,naming,unusedcode)
+PHPMD_RETVAL=$?
+
+if [ $PHPMD_RETVAL -ne 0 ]; then
+    echo "$PHPMD_OUTPUT" | less
+else
+    echo " :: Inspection is OK! :: "
+fi
+
 
 # delete temporary copy of staging area
 rm -rf $TMP_STAGING
 
-if [ $RETVAL -ne 0 ]; then
-    echo "$OUTPUT" | less
-fi
-
-exit $RETVAL
+exit $PHPCS_RETVAL
