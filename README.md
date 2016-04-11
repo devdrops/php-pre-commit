@@ -8,3 +8,4 @@ Git pre-commit file for PHP projects
 2. Copy the **config.dist** file to your Git hooks folder, and rename it to **config**.
 3. Edit the **config** file to add your preferences.
 
+Kudos for [Johnathan Pulos](https://github.com/codemis) for [his amazing Gist](https://gist.github.com/codemis/8225337) :wink:.
