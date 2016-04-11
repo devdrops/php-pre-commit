@@ -150,4 +150,6 @@ else
     tput setaf 2; echo " -> Inspection is OK!"
 fi
 
+tput setaf 7;
+
 exit 0;
