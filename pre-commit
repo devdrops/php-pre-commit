@@ -13,6 +13,10 @@
 #
 ##########
 
+GRAY='\033[0;37m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+
 PHPCS_BIN=/usr/bin/phpcs
 PHPMD_BIN=/usr/bin/phpmd
 PHPCS_CODING_STANDARD=PEAR
@@ -114,36 +118,36 @@ do
 done
 
 echo ""
-echo " :: PHP CodeSniffer inspection :: "
+tput setaf 7; echo " :: PHP CodeSniffer inspection :: "
 PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
 PHPCS_RETVAL=$?
 
 if [ $PHPCS_RETVAL -ne 0 ]; then
-    echo "    Issues found: "
+    tput setaf 1; echo " -> Issues found: "
+    tput setaf 7; 
     echo "$PHPCS_OUTPUT"
 
     rm -rf $TMP_STAGING
 
     exit $PHPCS_RETVAL
 else
-    echo " -> Inspection is OK!"
+    tput setaf 2; echo " -> Inspection is OK!"
 fi
 
 echo ""
-echo " :: PHP Mess Detector inspection :: "
-echo ""
+tput setaf 7; echo " :: PHP Mess Detector inspection :: "
 PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT_MODE $PHPMD_PATTERNS)
 PHPMD_RETVAL=$?
 
 if [ $PHPMD_RETVAL -ne 0 ]; then
-    echo "    Issues found: "
-    echo "$PHPMD_OUTPUT"
+    tput setaf 1; echo " -> Issues found: "
+    tput setaf 7; echo "$PHPMD_OUTPUT"
 
     rm -rf $TMP_STAGING
 
     exit $PHPMD_RETVAL
 else
-    echo " -> Inspection is OK!"
+    tput setaf 2; echo " -> Inspection is OK!"
 fi
 
 exit 0;
