@@ -21,3 +21,9 @@ PHPCS_IGNORE_WARNINGS=1
 
 # encoding
 PHPCS_ENCODING=utf-8
+
+# PHP Mess Detector output mode
+PHPMD_OUTPUT_MODE=text
+
+# PHP Mess Detector patterns
+PHPMD_PATTERNS=cleancode,codesize,controversial,design,naming,unusedcode

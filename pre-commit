@@ -16,6 +16,8 @@
 PHPCS_BIN=/usr/bin/phpcs
 PHPMD_BIN=/usr/bin/phpmd
 PHPCS_CODING_STANDARD=PEAR
+PHPMD_OUTPUT_MODE=text
+PHPMD_PATTERNS=cleancode,codesize,controversial,design,naming,unusedcode
 PHPCS_IGNORE=
 TMP_STAGING=".tmp_staging"
 
@@ -130,7 +132,7 @@ fi
 echo ""
 echo " :: PHP Mess Detector inspection :: "
 echo ""
-PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES text cleancode,codesize,controversial,design,naming,unusedcode)
+PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT_MODE $PHPMD_PATTERNS)
 PHPMD_RETVAL=$?
 
 if [ $PHPMD_RETVAL -ne 0 ]; then
