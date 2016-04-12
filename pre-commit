@@ -19,7 +19,7 @@ PHPCS_IGNORE=
 PHPMD_BIN=/usr/bin/phpmd
 PHPMD_OUTPUT=text
 PHPMD_PATTERNS_LIST=cleancode,codesize,controversial,design,naming,unusedcode
-TMP_STAGING=".tmp_staging"
+TMP_STAGING="/tmp/.tmp_staging"
 
 # Parse config
 CONFIG_FILE=$(dirname $0)/config
@@ -161,6 +161,8 @@ else
 fi
 
 tput setaf 7;
+
+rm -rf $TMP_STAGING
 
 echo ""
 exit 0;
