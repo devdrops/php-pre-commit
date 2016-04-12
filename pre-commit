@@ -108,7 +108,7 @@ fi
 if [ "$PHPMD_PATTERNS" != "" ]; then
     PHPMD_PATTERNS_LIST="$PHPMD_PATTERNS"
 else
-    PHPMD_PATTERNS_LIST="cleancode,codesize,controversial,design,naming,unusedcode"
+    PHPMD_PATTERNS_LIST="cleancode"
 fi
 
 
@@ -162,4 +162,5 @@ fi
 
 tput setaf 7;
 
+echo ""
 exit 0;
