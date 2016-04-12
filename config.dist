@@ -2,24 +2,25 @@
 PHPCS_BIN=/usr/local/bin/phpcs
 PHPMD_BIN=/usr/local/bin/phpmd
 
-# The coding standard, you can also specify a path to your own standard here.
+# The PHP CodeSniffer coding standard, you can also specify a path to your 
+# own standard here. 
 # e. g. /path/to/my/standard/dir/
 PHPCS_CODING_STANDARD=PSR2
 
-# Comma-separated list of file patterns being ignored.
+# Comma-separated list of file patterns being ignored by PHP CodeSniffer.
 PHPCS_IGNORE=
 
-# Comma-seperated list of sniffs from the standard that should be used.
+# Comma-seperated list of sniffs from PHP CodeSniffer that should be used.
 # Use `phpcs --standard=PSR1 -e` to list sniffs for your standard.
 PHPCS_SNIFFS=Generic.Files.ByteOrderMark,Generic.PHP.DisallowShortOpenTag
 
-# Egrep compatible pattern of files to be checked.
+# Egrep compatible pattern of files to be checked by PHP CodeSniffer.
 PHPCS_FILE_PATTERN="\.(php)$"
 
-# Ignore warnings.
+# Ignore PHP CodeSniffer warnings.
 PHPCS_IGNORE_WARNINGS=1
 
-# Encoding.
+# PHP CodeSniffer Encoding.
 PHPCS_ENCODING=utf-8
 
 # PHP Mess Detector output mode (default: text).
