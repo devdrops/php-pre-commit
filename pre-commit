@@ -13,31 +13,27 @@
 #
 ##########
 
-GRAY='\033[0;37m'
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-
 PHPCS_BIN=/usr/bin/phpcs
-PHPMD_BIN=/usr/bin/phpmd
 PHPCS_CODING_STANDARD=PEAR
-PHPMD_OUTPUT_MODE=text
-PHPMD_PATTERNS=cleancode,codesize,controversial,design,naming,unusedcode
 PHPCS_IGNORE=
+PHPMD_BIN=/usr/bin/phpmd
+PHPMD_OUTPUT=text
+PHPMD_PATTERNS_LIST=cleancode,codesize,controversial,design,naming,unusedcode
 TMP_STAGING=".tmp_staging"
 
-# parse config
+# Parse config
 CONFIG_FILE=$(dirname $0)/config
 if [ -e $CONFIG_FILE ]; then
     . $CONFIG_FILE
 fi
 
-# simple check if code sniffer is set up correctly
-if [ ! -x $PHPCS_BIN ]; then
-    echo "PHP CodeSniffer bin not found or executable -> $PHPCS_BIN"
+# Simple check if code sniffer is set up correctly
+if [ ! -x $PHPCS_BIN ] || [ ! -x $PHPMD_BIN ]; then
+    tput setaf 1; echo "Executable not found. Check $PHPCS_BIN and $PHPMD_BIN."
     exit 1
 fi
 
-# stolen from template file
+# Stolen from template file
 if git rev-parse --verify HEAD
 then
     against=HEAD
@@ -46,8 +42,8 @@ else
     against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 fi
 
-# this is the magic:
-# retrieve all files in staging area that are added, modified or renamed
+# This is the magic:
+# Retrieve all files in staging area that are added, modified or renamed
 # but no deletions etc
 FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- )
 
@@ -55,13 +51,13 @@ if [ "$FILES" == "" ]; then
     exit 0
 fi
 
-# create temporary copy of staging area
+# Create temporary copy of staging area
 if [ -e $TMP_STAGING ]; then
     rm -rf $TMP_STAGING
 fi
 mkdir $TMP_STAGING
 
-# match files against whitelist
+# Match files against whitelist
 FILES_TO_CHECK=""
 for FILE in $FILES
 do
@@ -77,7 +73,7 @@ if [ "$FILES_TO_CHECK" == "" ]; then
     exit 0
 fi
 
-# execute the code sniffer
+# Validate PHP CodeSniffer variables
 if [ "$PHPCS_IGNORE" != "" ]; then
     IGNORE="--ignore=$PHPCS_IGNORE"
 else
@@ -102,16 +98,30 @@ else
     IGNORE_WARNINGS=""
 fi
 
+# Validate PHP Mess Detector variables
+if [ "$PHPMD_OUTPUT_MODE" != "" ]; then
+    PHPMD_OUTPUT="$PHPMD_OUTPUT_MODE"
+else
+    PHPMD_OUTPUT="text"
+fi
+
+if [ "$PHPMD_PATTERNS" != "" ]; then
+    PHPMD_PATTERNS_LIST="$PHPMD_PATTERNS"
+else
+    PHPMD_PATTERNS_LIST="cleancode"
+fi
+
+
 # Copy contents of staged version of files to temporary staging area
 # because we only want the staged version that will be commited and not
-# the version in the working directory
+# the version in the working directory.
 STAGED_FILES=""
 for FILE in $FILES_TO_CHECK
 do
   ID=$(git diff-index --cached $against $FILE | cut -d " " -f4)
 
-  # create staged version of file in temporary staging area with the same
-  # path as the original file so that the phpcs ignore filters can be applied
+  # Create staged version of file in temporary staging area with the same
+  # path as the original file so that the phpcs ignore filters can be applied.
   mkdir -p "$TMP_STAGING/$(dirname $FILE)"
   git cat-file blob $ID > "$TMP_STAGING/$FILE"
   STAGED_FILES="$STAGED_FILES $TMP_STAGING/$FILE"
@@ -136,7 +146,7 @@ fi
 
 echo ""
 tput setaf 7; echo " :: PHP Mess Detector inspection :: "
-PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT_MODE $PHPMD_PATTERNS)
+PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST)
 PHPMD_RETVAL=$?
 
 if [ $PHPMD_RETVAL -ne 0 ]; then
@@ -152,4 +162,5 @@ fi
 
 tput setaf 7;
 
+echo ""
 exit 0;
