@@ -34,3 +34,6 @@ PHPMD_SUFFIXES=php
 
 # PHP Mess Detector list of files/folders to exclude
 PHPMD_EXCLUDE=
+
+# List of file patterns to exclude (using `grep`)
+GIT_EXCLUDE="Test"
