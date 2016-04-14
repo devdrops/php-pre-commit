@@ -28,3 +28,9 @@ PHPMD_OUTPUT_MODE=text
 
 # PHP Mess Detector patterns (defaults: cleancode).
 PHPMD_PATTERNS=cleancode,codesize,controversial,design,naming,unusedcode
+
+# PHP Mess Detector file suffixes
+PHPMD_SUFFIXES=php
+
+# PHP Mess Detector list of files/folders to exclude
+PHPMD_EXCLUDE=
