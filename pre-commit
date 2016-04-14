@@ -44,8 +44,15 @@ fi
 
 # This is the magic:
 # Retrieve all files in staging area that are added, modified or renamed
-# but no deletions etc
-FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- )
+# but no deletions etc.
+# Lets first check if there are any file pattern to exclude from this list
+if [ "$GIT_EXCLUDE" != "" ]; then
+    GIT_EXCLUDE_LIST="| grep -v $GIT_EXCLUDE"
+else
+    GIT_EXCLUDE_LIST=""
+fi
+
+FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- $GIT_EXCLUDE_LIST)
 
 if [ "$FILES" == "" ]; then
     exit 0
