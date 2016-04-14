@@ -111,6 +111,17 @@ else
     PHPMD_PATTERNS_LIST="cleancode"
 fi
 
+if [ "$PHPMD_SUFFIXES" != "" ]; then
+    PHPMD_SUFFIXES_LIST="--suffixes $PHPMD_SUFFIXES"
+else
+    PHPMD_SUFFIXES_LIST=""
+fi
+
+if [ "$PHPMD_EXCLUDE" != "" ]; then
+    PHPMD_EXCLUDE_LIST="--exclude $PHPMD_EXCLUDE"
+else
+    PHPMD_EXCLUDE_LIST=""
+fi
 
 # Copy contents of staged version of files to temporary staging area
 # because we only want the staged version that will be commited and not
@@ -146,7 +157,7 @@ fi
 
 echo ""
 tput setaf 7; echo " :: PHP Mess Detector inspection :: "
-PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST)
+PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST $PHPMD_SUFFIXES_LIST $PHPMD_EXCLUDE_LIST)
 PHPMD_RETVAL=$?
 
 if [ $PHPMD_RETVAL -ne 0 ]; then
