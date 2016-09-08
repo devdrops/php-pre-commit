@@ -198,23 +198,23 @@ done
 ##########
 if [ "$PHPCS_ACTIVE" == "1" ]; then
     echo ""
-    tput setaf 7; echo " :: PHP CodeSniffer inspection :: "
+    tput setaf 12; echo " :: PHP CodeSniffer inspection :: "
     PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS $PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
     PHPCS_RETVAL=$?
 
     if [ $PHPCS_RETVAL -ne 0 ]; then
-        tput setaf 1; echo " \u2718 Issues found: "
+        tput setaf 1; echo " ✘ Issues found: "
         tput setaf 7; echo "$PHPCS_OUTPUT"
 
         rm -rf $TMP_STAGING
 
         exit $PHPCS_RETVAL
     else
-        tput setaf 2; echo " \u2714 Inspection is OK!"
+        tput setaf 2; echo " ✔ Inspection is OK!"
     fi
 else
     echo ""
-    tput setaf 8; echo " :-( PHP CodeSniffer inspection is OFF."
+    tput setaf 8; echo " ➔ PHP CodeSniffer inspection is OFF."
 fi
 
 
@@ -223,26 +223,26 @@ fi
 ##########
 if [ "$PHPMD_ACTIVE" == "1" ]; then
     echo ""
-    tput setaf 7; echo " :: PHP Mess Detector inspection :: "
+    tput setaf 12; echo " :: PHP Mess Detector inspection :: "
     PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST $PHPMD_SUFFIXES_LIST $PHPMD_EXCLUDE_LIST)
     PHPMD_RETVAL=$?
 
     if [ $PHPMD_RETVAL -ne 0 ]; then
-        tput setaf 1; echo " \u2718 Issues found: "
+        tput setaf 1; echo " ✘ Issues found: "
         tput setaf 7; echo "$PHPMD_OUTPUT"
 
         rm -rf $TMP_STAGING
 
         exit $PHPMD_RETVAL
     else
-        tput setaf 2; echo " '\u2714' Inspection is OK!"
+        tput setaf 2; echo " ✔ Inspection is OK!"
     fi
 else
     echo ""
-    tput setaf 8; echo " :-( PHP Mess Detector inspection is OFF."
+    tput setaf 8; echo " ➔ PHP Mess Detector inspection is OFF."
 fi
 
-tput setaf 7;
+tput setaf 12;
 
 
 
