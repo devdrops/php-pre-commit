@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ##########
 # Git Pre-Commit file for PHP projects
 ###
@@ -13,27 +14,47 @@
 #
 ##########
 
+
+##########
+# DEFAULT SETTINGS
+###
+#
+# These variables define the basic values for Code_Sniffer and PHPMD.
+# Override these by creating a new variable on the `config` file.
+#
+##########
+PHPCS_ACTIVE=1
 PHPCS_BIN=/usr/bin/phpcs
 PHPCS_CODING_STANDARD=PEAR
 PHPCS_IGNORE=
+PHPMD_ACTIVE=1
 PHPMD_BIN=/usr/bin/phpmd
 PHPMD_OUTPUT=text
 PHPMD_PATTERNS_LIST=cleancode,codesize,controversial,design,naming,unusedcode
 TMP_STAGING="/tmp/.tmp_staging"
 
-# Parse config
+
+##########
+# Parse config file.
+##########
 CONFIG_FILE=$(dirname $0)/config
 if [ -e $CONFIG_FILE ]; then
     . $CONFIG_FILE
 fi
 
-# Simple check if code sniffer is set up correctly
+
+##########
+# First: check if PHP Code_Sniffer and PHPMD bin files are present && executable.
+##########
 if [ ! -x $PHPCS_BIN ] || [ ! -x $PHPMD_BIN ]; then
     tput setaf 1; echo "Executable not found. Check $PHPCS_BIN and $PHPMD_BIN."
     exit 1
 fi
 
-# Stolen from template file
+
+##########
+# Git Check-up
+##########
 if git rev-parse --verify HEAD
 then
     against=HEAD
@@ -43,20 +64,22 @@ else
 fi
 
 # This is the magic:
-# Retrieve all files in staging area that are added, modified or renamed
+# Retrieve all files in staging area that are ADDED, MODIFIED or RENAMED,
 # but no deletions etc.
-# Lets first check if there are any file pattern to exclude from this list
+# Lets first check if there are any file pattern to exclude from this list.
 if [ "$GIT_EXCLUDE" != "" ]; then
     GIT_EXCLUDE_LIST="| grep -v $GIT_EXCLUDE"
 else
     GIT_EXCLUDE_LIST=""
 fi
 
+
 FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- $GIT_EXCLUDE_LIST)
 
 if [ "$FILES" == "" ]; then
     exit 0
 fi
+
 
 # Create temporary copy of staging area
 if [ -e $TMP_STAGING ]; then
@@ -80,11 +103,24 @@ if [ "$FILES_TO_CHECK" == "" ]; then
     exit 0
 fi
 
+
+##########
 # Validate PHP CodeSniffer variables
+##########
+if [ "$PHPCS_ACTIVE" != "1" ]; then
+    PHPCS_ACTIVE=0
+fi
+
 if [ "$PHPCS_IGNORE" != "" ]; then
     IGNORE="--ignore=$PHPCS_IGNORE"
 else
     IGNORE=""
+fi
+
+if [ "$PHPCS_CODING_STANDARD" != "" ]; then
+    PHPCS_CODING_STANDARD="--standard=$PHPCS_CODING_STANDARD"
+else
+    PHPCS_CODING_STANDARD=""
 fi
 
 if [ "$PHPCS_SNIFFS" != "" ]; then
@@ -105,7 +141,14 @@ else
     IGNORE_WARNINGS=""
 fi
 
+
+##########
 # Validate PHP Mess Detector variables
+##########
+if [ "$PHPMD_ACTIVE" != "1" ]; then
+    PHPMD_ACTIVE=0
+fi
+
 if [ "$PHPMD_OUTPUT_MODE" != "" ]; then
     PHPMD_OUTPUT="$PHPMD_OUTPUT_MODE"
 else
@@ -130,57 +173,82 @@ else
     PHPMD_EXCLUDE_LIST=""
 fi
 
+
+##########
 # Copy contents of staged version of files to temporary staging area
 # because we only want the staged version that will be commited and not
 # the version in the working directory.
+##########
 STAGED_FILES=""
 for FILE in $FILES_TO_CHECK
 do
-  ID=$(git diff-index --cached $against $FILE | cut -d " " -f4)
-
-  # Create staged version of file in temporary staging area with the same
-  # path as the original file so that the phpcs ignore filters can be applied.
-  mkdir -p "$TMP_STAGING/$(dirname $FILE)"
-  git cat-file blob $ID > "$TMP_STAGING/$FILE"
-  STAGED_FILES="$STAGED_FILES $TMP_STAGING/$FILE"
+    ID=$(git diff-index --cached $against $FILE | cut -d " " -f4)
+    ##########
+    # Create staged version of file in temporary staging area with the same
+    # path as the original file so that the phpcs ignore filters can be applied.
+    ##########
+    mkdir -p "$TMP_STAGING/$(dirname $FILE)"
+    git cat-file blob $ID > "$TMP_STAGING/$FILE"
+    STAGED_FILES="$STAGED_FILES $TMP_STAGING/$FILE"
 done
 
-echo ""
-tput setaf 7; echo " :: PHP CodeSniffer inspection :: "
-PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
-PHPCS_RETVAL=$?
 
-if [ $PHPCS_RETVAL -ne 0 ]; then
-    tput setaf 1; echo " -> Issues found: "
-    tput setaf 7; 
-    echo "$PHPCS_OUTPUT"
+##########
+# CODE INSPECTION: PHP CodeSniffer
+##########
+if [ "$PHPCS_ACTIVE" == "1" ]; then
+    echo ""
+    tput setaf 12; echo " :: PHP CodeSniffer inspection :: "
+    PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS $PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
+    PHPCS_RETVAL=$?
 
-    rm -rf $TMP_STAGING
+    if [ $PHPCS_RETVAL -ne 0 ]; then
+        tput setaf 1; echo " ✘ Issues found: "
+        tput setaf 7; echo "$PHPCS_OUTPUT"
 
-    exit $PHPCS_RETVAL
+        rm -rf $TMP_STAGING
+
+        exit $PHPCS_RETVAL
+    else
+        tput setaf 2; echo " ✔ Inspection is OK!"
+    fi
 else
-    tput setaf 2; echo " -> Inspection is OK!"
+    echo ""
+    tput setaf 8; echo " ➔ PHP CodeSniffer inspection is OFF."
 fi
 
-echo ""
-tput setaf 7; echo " :: PHP Mess Detector inspection :: "
-PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST $PHPMD_SUFFIXES_LIST $PHPMD_EXCLUDE_LIST)
-PHPMD_RETVAL=$?
 
-if [ $PHPMD_RETVAL -ne 0 ]; then
-    tput setaf 1; echo " -> Issues found: "
-    tput setaf 7; echo "$PHPMD_OUTPUT"
+##########
+# CODE INSPECTION: PHP Mess Detector
+##########
+if [ "$PHPMD_ACTIVE" == "1" ]; then
+    echo ""
+    tput setaf 12; echo " :: PHP Mess Detector inspection :: "
+    PHPMD_OUTPUT=$($PHPMD_BIN $STAGED_FILES $PHPMD_OUTPUT $PHPMD_PATTERNS_LIST $PHPMD_SUFFIXES_LIST $PHPMD_EXCLUDE_LIST)
+    PHPMD_RETVAL=$?
 
-    rm -rf $TMP_STAGING
+    if [ $PHPMD_RETVAL -ne 0 ]; then
+        tput setaf 1; echo " ✘ Issues found: "
+        tput setaf 7; echo "$PHPMD_OUTPUT"
 
-    exit $PHPMD_RETVAL
+        rm -rf $TMP_STAGING
+
+        exit $PHPMD_RETVAL
+    else
+        tput setaf 2; echo " ✔ Inspection is OK!"
+    fi
 else
-    tput setaf 2; echo " -> Inspection is OK!"
+    echo ""
+    tput setaf 8; echo " ➔ PHP Mess Detector inspection is OFF."
 fi
 
-tput setaf 7;
+tput setaf 12;
+
+
 
 rm -rf $TMP_STAGING
+
+
 
 echo ""
 exit 0;

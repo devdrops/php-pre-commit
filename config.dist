@@ -1,3 +1,7 @@
+# Enable tools
+PHPCS_ACTIVE=1
+PHPMD_ACTIVE=1
+
 # Path to binaries.
 PHPCS_BIN=/usr/local/bin/phpcs
 PHPMD_BIN=/usr/local/bin/phpmd
@@ -36,4 +40,4 @@ PHPMD_SUFFIXES=php
 PHPMD_EXCLUDE=
 
 # List of file patterns to exclude (using `grep`)
-GIT_EXCLUDE="Test"
+GIT_EXCLUDE=
