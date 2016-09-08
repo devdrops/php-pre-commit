@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ##########
 # Git Pre-Commit file for PHP projects
 ###
@@ -12,6 +13,7 @@
 # @author Davi Marcondes Moreira <davi.marcondes.moreira@gmail.com>
 #
 ##########
+
 
 ##########
 # DEFAULT SETTINGS
@@ -71,11 +73,13 @@ else
     GIT_EXCLUDE_LIST=""
 fi
 
+
 FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- $GIT_EXCLUDE_LIST)
 
 if [ "$FILES" == "" ]; then
     exit 0
 fi
+
 
 # Create temporary copy of staging area
 if [ -e $TMP_STAGING ]; then
@@ -114,7 +118,7 @@ else
 fi
 
 if [ "$PHPCS_CODING_STANDARD" != "" ]; then
-    PHPCS_CODING_STANDARD="--sniffs=$PHPCS_CODING_STANDARD"
+    PHPCS_CODING_STANDARD="--standard=$PHPCS_CODING_STANDARD"
 else
     PHPCS_CODING_STANDARD=""
 fi
@@ -169,6 +173,7 @@ else
     PHPMD_EXCLUDE_LIST=""
 fi
 
+
 ##########
 # Copy contents of staged version of files to temporary staging area
 # because we only want the staged version that will be commited and not
@@ -194,22 +199,22 @@ done
 if [ "$PHPCS_ACTIVE" == "1" ]; then
     echo ""
     tput setaf 7; echo " :: PHP CodeSniffer inspection :: "
-    PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS --standard=$PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
+    PHPCS_OUTPUT=$($PHPCS_BIN -s $IGNORE_WARNINGS $PHPCS_CODING_STANDARD $ENCODING $IGNORE $STAGED_FILES)
     PHPCS_RETVAL=$?
 
     if [ $PHPCS_RETVAL -ne 0 ]; then
-        tput setaf 1; echo " -> Issues found: "
+        tput setaf 1; echo " \u2718 Issues found: "
         tput setaf 7; echo "$PHPCS_OUTPUT"
 
         rm -rf $TMP_STAGING
 
         exit $PHPCS_RETVAL
     else
-        tput setaf 2; echo " -> Inspection is OK!"
+        tput setaf 2; echo " \u2714 Inspection is OK!"
     fi
 else
     echo ""
-    tput setaf 8; echo ":-( PHP CodeSniffer inspection is OFF."
+    tput setaf 8; echo " :-( PHP CodeSniffer inspection is OFF."
 fi
 
 
@@ -223,24 +228,26 @@ if [ "$PHPMD_ACTIVE" == "1" ]; then
     PHPMD_RETVAL=$?
 
     if [ $PHPMD_RETVAL -ne 0 ]; then
-        tput setaf 1; echo " -> Issues found: "
+        tput setaf 1; echo " \u2718 Issues found: "
         tput setaf 7; echo "$PHPMD_OUTPUT"
 
         rm -rf $TMP_STAGING
 
         exit $PHPMD_RETVAL
     else
-        tput setaf 2; echo " -> Inspection is OK!"
+        tput setaf 2; echo " '\u2714' Inspection is OK!"
     fi
 else
     echo ""
-    tput setaf 8; echo ":-( PHP Mess Detector inspection is OFF."
+    tput setaf 8; echo " :-( PHP Mess Detector inspection is OFF."
 fi
 
 tput setaf 7;
 
 
+
 rm -rf $TMP_STAGING
+
 
 
 echo ""
