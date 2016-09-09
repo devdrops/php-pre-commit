@@ -214,7 +214,7 @@ if [ "$PHPCS_ACTIVE" == "1" ]; then
     fi
 else
     echo ""
-    tput setaf 8; echo " ➔ PHP CodeSniffer inspection is OFF."
+    tput setaf 8; echo " >> PHP CodeSniffer inspection is OFF."
 fi
 
 
@@ -239,7 +239,7 @@ if [ "$PHPMD_ACTIVE" == "1" ]; then
     fi
 else
     echo ""
-    tput setaf 8; echo " ➔ PHP Mess Detector inspection is OFF."
+    tput setaf 8; echo " >> PHP Mess Detector inspection is OFF."
 fi
 
 tput setaf 12;
